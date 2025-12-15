@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>摸鱼日历 - 今日摸鱼指数查询</title>
+<link rel="icon" href="https://p11-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/c01d92765d2347e09d90fd49a77a4f78.png~tplv-a9rns2rl98-24:720:720.png?rcl=20251215100001A584EFD9823593800EC1&rk3s=8e244e95&rrcfp=8a172a1a&x-expires=1766368801&x-signature=OlP5jrWMqe0gNCSTEqzKKwMjnXU%3D" type="image/png" sizes="32x32">
+<link rel="shortcut icon" href="https://p11-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/c01d92765d2347e09d90fd49a77a4f78.png~tplv-a9rns2rl98-24:720:720.png?rcl=20251215100001A584EFD9823593800EC1&rk3s=8e244e95&rrcfp=8a172a1a&x-expires=1766368801&x-signature=OlP5jrWMqe0gNCSTEqzKKwMjnXU%3D" type="image/png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<style>
+:root{
+  --bg:#f5f5f5;
+  --ink:#111;
+  --gray:#666;
+  --border:#222;
+  --fish-index-color: #ff7f00;
+  --footer-note-color: #999;
+}
+body{
+  margin:0;
+  padding:20px;
+  background:#ddd;
+  font-family:"Microsoft YaHei",sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 15px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+@media (min-width: 768px) {
+  body {
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: flex-start;
+    padding: 20px 40px;
+  }
+  .right-container {
+    margin-left: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    flex-shrink: 0;
+    width: 450px;
+  }
+  .right-info-panel {
+    background: var(--bg);
+    border: 3px solid var(--border);
+    border-radius: 14px;
+    padding: 15px;
+    width: 450px;
+    height: 400px;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+  .export-btn-wrapper {
+    width: 450px;
+    margin-top: 0;
+  }
+  .poster {
+    width: 640px !important;
+    flex-shrink: 0;
+  }
+  @media (max-width: 1110px) {
+    .right-container {
+      display: none;
+    }
+  }
+}
+.export-btn-wrapper {
+  width: 100%;
+  max-width: 200px;
+  margin-top: 10px;
+}
+.export-btn-wrapper button {
+  width: 100%;
+  padding: 12px 8px;
+  border-radius: 10px;
+  border: 2px solid var(--border);
+  background: #fff;
+  box-sizing: border-box;
+  cursor: pointer;
+  font-size: 16px;
+}
+.right-info-panel {
+  display: none;
+}
+@media (min-width: 768px) {
+  .right-info-panel {
+    display: block;
+  }
+}
+.right-info-panel .calendar-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin: 0 0 10px 0;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--border);
+  text-align: left;
+}
+.right-info-panel .quote-title {
+  font-size: 16px;
+  color: var(--gray);
+  margin: 10px 0 5px 0;
+  text-align: left;
+}
+.right-info-panel .quote-content {
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 10px;
+  text-align: left;
+  word-wrap: break-word;
+  word-break: break-all;
+  white-space: normal;
+}
+.right-info-panel .lunar-data {
+  font-size: 12px;
+  line-height: 1.8;
+  background: #f0f0f0;
+  padding: 8px;
+  border-radius: 8px;
+  margin-top: 10px;
+  text-align: left;
+}
+.poster{
+  max-width: 640px;
+  width: 100%;
+  margin:0;
+  background:var(--bg);
+  border:3px solid var(--border);
+  border-radius:14px;
+  padding:14px;
+  position:relative;
+  box-sizing: border-box;
+}
+.moyu-title-mobile {
+  text-align: center;
+  margin: 0 0 10px 0;
+}
+.title-big-mobile {
+  font-size: 40px;
+  font-weight: bold;
+  color: var(--ink);
+  letter-spacing: 8px;
+  margin: 0;
+}
+.title-pinyin-mobile {
+  font-size: 16px;
+  color: var(--gray);
+  margin: 4px 0 0 0;
+  letter-spacing: 2px;
+}
+.title-big {
+  font-size: 48px;
+  font-weight: bold;
+  color: #fff;
+  letter-spacing: 12px;
+  margin: 0;
+  display: none;
+}
+.title-pinyin {
+  font-size: 14px;
+  color: #ddd;
+  margin: 6px 0 0 0;
+  letter-spacing: 2px;
+  display: none;
+}
+@media (min-width: 768px) {
+  .moyu-title-mobile {
+    display: none;
+  }
+  .title-big, .title-pinyin {
+    display: block;
+  }
+}
+.topbar{
+  font-size:12px;
+  color:var(--gray);
+  display:flex;
+  justify-content:space-between;
+  margin-bottom: 8px;
+  align-items:center;
+}
+.top-gif {
+  width:30px;
+  height:30px;
+  margin-right:8px;
+  border-radius:4px;
+}
+.main-title{
+  background:#222;
+  color:#fff;
+  border-radius:14px;
+  padding:16px 20px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin:12px 0;
+  height: 140px;
+  box-sizing: border-box;
+}
+.date-week-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding-left: 10px;
+}
+.date-left {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+}
+.date-year-month {
+  font-size: 18px;
+  color: #fff;
+  margin-bottom: 4px;
+}
+.date-num {
+  font-size: 72px;
+  font-weight: bold;
+  line-height: 1;
+  margin: 0;
+}
+.week-vertical {
+  font-size: 20px;
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+  letter-spacing: 6px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.title-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  flex: 1;
+  padding: 0 20px;
+}
+.weekend-right {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  text-align: center;
+  width: 80px;
+  padding-right: 10px;
+}
+.weekend-num {
+  font-size: 32px;
+  font-weight: bold;
+  margin: 6px 0;
+  line-height: 1;
+}
+.info-block {
+  display:flex;
+  align-items:stretch;
+  gap:15px;
+  border:2px solid var(--border);
+  border-radius:12px;
+  padding:15px;
+  margin-top:10px;
+  box-sizing: border-box;
+  min-height: 200px;
+}
+.info-text {
+  flex:1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px !important;
+  align-items: flex-start;
+  justify-content: space-between;
+  height: 100%;
+}
+@media (min-width: 768px) {
+  .info-text-top {
+    margin-bottom: auto;
+    padding-top: 0;
+  }
+  .info-text-middle {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+  }
+  .info-text-bottom {
+    margin-top: auto;
+    padding-bottom: 0;
+    align-self: flex-start;
+    margin-bottom: 0;
+  }
+  .info-img {
+    align-self: flex-start;
+    margin-bottom: 0;
+  }
+}
+.fish-index-number {
+  color: var(--fish-index-color);
+  font-weight: bold;
+}
+.info-img {
+  width: auto;
+  height: 100%;
+  max-height: 190px;
+  max-width: 190px;
+  object-fit:contain;
+  border-radius:8px;
+  flex-shrink: 0;
+  align-self: flex-start;
+  margin-bottom: 0;
+}
+@media (max-width: 767px) {
+  .info-img {
+    display: none !important;
+  }
+  .info-block {
+    min-height: auto;
+    align-items: flex-start;
+  }
+  .info-text {
+    justify-content: flex-start;
+    height: auto;
+  }
+  .info-text-top, .info-text-middle, .info-text-bottom {
+    margin: 0;
+    flex: none;
+  }
+}
+#lunar {
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 1.4 !important;
+}
+#todaySpecial {
+  margin: 2px 0 !important;
+  padding: 0 !important;
+  line-height: 1.6 !important;
+  font-size: 15px !important;
+}
+#fortune {
+  margin-top: 4px !important;
+  line-height: 1.4 !important;
+}
+#fishLevel {
+  margin-top: 4px !important;
+}
+#zodiac {
+  margin-top: 4px !important;
+}
+.block{
+  border:2px solid var(--border);
+  border-radius:12px;
+  padding:10px;
+  margin-top:10px;
+  box-sizing: border-box;
+}
+.block h3{
+  margin:0 0 6px 0;
+  font-size:14px;
+}
+.pill{
+  display:inline-block;
+  border:2px solid var(--border);
+  border-radius:999px;
+  padding:4px 10px;
+  font-size:13px;
+  margin:4px 4px 0 0;
+}
+.illustration{
+  display:none;
+}
+.footer{
+  margin-top:10px;
+  font-size:14px;
+  border-top:2px solid var(--border);
+  padding-top:6px;
+  line-height:1.6;
+}
+.footer-note {
+  color: var(--footer-note-color);
+  font-size:13px;
+}
+.poster button {
+  display: none;
+}
+.timeline-container {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+.timeline-container .block {
+  flex: 1;
+  margin-top: 0;
+}
+@media (max-width: 767px) {
+  .poster {
+    max-width: 100%;
+    padding: 10px;
+  }
+  .main-title {
+    height: 120px;
+    padding: 10px 15px;
+  }
+  .date-year-month {
+    font-size: 14px;
+  }
+  .date-num {
+    font-size: 60px;
+  }
+  .weekend-num {
+    font-size: 28px;
+  }
+  .week-vertical {
+    font-size: 18px;
+  }
+  .date-week-wrapper {
+    gap: 10px;
+  }
+  .top-gif {
+    width:25px;
+    height:25px;
+  }
+  .main-title {
+    height: auto;
+    min-height: 100px;
+    flex-wrap: wrap;
+  }
+  .title-center {
+    padding: 0;
+    margin-top: 10px;
+    width: 100%;
+    order: 3;
+  }
+  .date-week-wrapper {
+    width: 60%;
+  }
+  .weekend-right {
+    width: 30%;
+    padding-right: 0;
+  }
+}
+</style>
+</head>
+<body>
+  <div class="poster" id="poster">
+    <div class="moyu-title-mobile">
+      <h1 class="title-big-mobile">摸鱼日历</h1>
+      <p class="title-pinyin-mobile">jin tian ni mo yu le ma?</p>
+    </div>
+
+    <div class="topbar">
+      <div style="display:flex;align-items:center;">
+        <img class="top-gif" src="https://xximg1.meitudata.com/wechat-program/693e5bf550fd1bl4gs928f7732.gif" alt="摸鱼GIF">
+        <div>摸鱼哲学：摸鱼是职场智慧，不是态度问题</div>
+      </div>
+      <div>公众号：柒吾</div>
+    </div>
+
+    <div class="main-title">
+      <div class="date-week-wrapper">
+        <div class="date-left">
+          <div class="date-year-month" id="yearMonth">2025年12月</div>
+          <div class="date-num" id="dayNum">14</div>
+        </div>
+        <div class="week-vertical" id="week">星期日</div>
+      </div>
+      <div class="title-center">
+        <h1 class="title-big">摸鱼日历</h1>
+        <p class="title-pinyin">jin tian ni mo yu le ma?</p>
+      </div>
+      <div class="weekend-right">
+        <div>距离周末</div>
+        <div class="weekend-num" id="weekend"></div>
+        <div id="weekendText">就是今天</div>
+      </div>
+    </div>
+
+    <div class="info-block">
+      <div class="info-text">
+        <div class="info-text-top">
+          <h3 id="lunar">📅 今日是周末</h3>
+        </div>
+        <div class="info-text-middle">
+          <div id="todaySpecial" style="font-size: 15px;"></div>
+        </div>
+        <div class="info-text-bottom">
+          <div id="fortune">摸鱼时记得屏蔽老板，财运+1</div>
+          <div id="fishLevel" class="pill">摸鱼指数 <span class="fish-index-number">77%</span> ｜ 🐡 熟练工</div>
+          <div id="zodiac">⭐ 摩羯座：小心摸鱼被抓</div>
+        </div>
+      </div>
+      <img class="info-img" id="randomFishImg" src="https://xximg1.meitudata.com/wechat-program/693e5bf199b7fhsdrc1q4e1153.jpg" alt="摸鱼图片">
+    </div>
+
+    <div class="illustration">🐟</div>
+
+    <div class="timeline-container">
+      <div class="block" id="timeline">
+        <h3>🔔 今日摸鱼时间轴</h3>
+        <div style="font-size:13px;line-height:1.8">
+          09:00 伪装上班<br>
+          10:30 假装思考<br>
+          11:30 上午摸鱼<br>
+          14:00 午后犯困<br>
+          16:00 深度摸鱼<br>
+          17:30 准备跑路
+        </div>
+      </div>
+
+      <div class="block" id="salary-countdown">
+        <h3>💰 发工资倒计时</h3>
+        <div style="font-size:13px;line-height:1.8" id="salaryDays">月初：18天<br>10号：27天<br>15号 ：明天发！🥳<br>20号：6天<br>25号：11天<br>月底：17天<br></div>
+      </div>
+    </div>
+
+    <div class="block" id="festival"><h3>🎉 节日倒计时</h3><span class="pill">元旦：18天</span><span class="pill">春节：46天</span><span class="pill">清明：112天</span><span class="pill">劳动节：138天</span><span class="pill">端午：168天</span><span class="pill">中秋：296天</span><span class="pill">国庆：291天</span></div>
+
+    <div class="footer" id="footerText">
+      <span id="footer-quote"></span><br>
+      <span class="footer-note">本页面仅供精神放松使用，对老板无效。</span>
+    </div>
+  </div>
+
+  <div class="right-container">
+    <div class="right-info-panel">
+      <div class="calendar-title" id="pc-calendar-title">2025-12-14 / 星期日</div>
+      <div class="quote-title">打工人语录</div>
+      <div class="quote-content" id="pc-quote-content"></div>
+      <div class="lunar-data" id="pc-lunar-data"></div>
+    </div>
+
+    <div class="export-btn-wrapper">
+      <button onclick="exportImg()">导出图片</button>
+    </div>
+  </div>
+
+<script src="https://cdn.jsdelivr.net/npm/solarlunar@2.0.7/lib/solarlunar.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+<script>
+const LunarCalculator = {
+  getLunarInfo: function(date) {
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    const lunarData = solarlunar.solar2lunar(year, month, day);
+    
+    return {
+      lunarYear: lunarData.yearCn || year,
+      lunarMonth: lunarData.monthCn || '',
+      lunarDay: lunarData.dayCn || '',
+      gzYear: lunarData.gzYear || '',
+      gzMonth: lunarData.gzMonth || '',
+      gzDay: lunarData.gzDay || '',
+      animal: lunarData.animal || '',
+      term: lunarData.term || '无',
+      isLeap: lunarData.isLeap || false,
+      ncWeek: lunarData.ncWeek || ''
+    };
+  },
+  
+  formatLunarHtml: function(lunarInfo) {
+    return `
+      📅 农历：${lunarInfo.lunarYear} ${lunarInfo.lunarMonth}${lunarInfo.lunarDay}<br>
+      🌿 天干地支：${lunarInfo.gzYear || '未知'}年 ${lunarInfo.gzMonth || '未知'}月 ${lunarInfo.gzDay || '未知'}日<br>
+      🐲 生肖：${lunarInfo.animal || '未知'} | 节气：${lunarInfo.term}<br>
+      📆 闰月：${lunarInfo.isLeap ? '是' : '否'}
+    `;
+  },
+  
+  getLunarDisplayText: function(lunarInfo, isWeekend) {
+    return isWeekend ? `📅 今日是周末` : `📅 摸鱼总经办提醒您`;
+  }
+};
+</script>
+
+<script>
+const today = new Date();
+const weekDays = ['日', '一', '二', '三', '四', '五', '六'];
+const lunarInfo = LunarCalculator.getLunarInfo(today);
+
+const fishImgList = [
+  'https://xximg1.meitudata.com/wechat-program/693e5bf1688897bivh8u605913.jpg',
+  'https://xximg1.meitudata.com/wechat-program/693e5bf19ebbd9t5mu2zzc9443.jpg',
+  'https://xximg1.meitudata.com/wechat-program/693e5bf1947e1ur17sr4i37516.jpg',
+  'https://xximg1.meitudata.com/wechat-program/693e5bf1989d2m0bumtx1l8208.jpg',
+  'https://xximg1.meitudata.com/wechat-program/693e5bf199b7fhsdrc1q4e1153.jpg'
+];
+
+const dayOfWeek = today.getDay();
+const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+let weekendDays = 7 - dayOfWeek - (dayOfWeek === 0 ? 7 : 0);
+
+function getTimeGreeting() {
+  const hour = new Date().getHours();
+  if (hour >= 5 && hour < 9) return '早上好';
+  if (hour >= 9 && hour < 12) return '上午好';
+  if (hour >= 12 && hour < 14) return '中午好';
+  if (hour >= 14 && hour < 18) return '下午好';
+  return '晚上好';
+}
+
+const allQuotes = [
+  '奥德彪至死都认为他生活过得不好是因为香蕉拉得不够多',
+  '想买一件羽绒服，但是999感冒灵才22块钱，于是我又穿着短裤出门了！早安，打工人！',
+  '我真的太喜欢上班了，这种低人一等，累死累活还赚不到钱的感觉，真的太让人着迷了',
+  '工资就像大姨妈，一个月来一次，一个星期左右就没了。',
+  '小时候不明白章鱼哥天天上班为什么拉着个脸，直到我天天上班我才明白',
+  '什么叫万死不辞，就是每天被气死一万次，依然不辞职。',
+  '你每天都很忙的样子，可是你又穷，所以你在忙什么？',
+  '去看牙，牙医问我年纪轻轻的牙齿怎么磨损这么严重？我说这些年，我都是咬着牙过来的。',
+  '办公室为什么一直弥漫着一股海鲜味？原来都是你们在摸鱼？',
+  '世界上最痛苦的三件事：上班、早起为了上班、早睡为了早起上班',
+  '皮革厂会倒，小姨子会跑，只有你打工到老！加油打工人！',
+  '当我一觉醒来精神焕发，我就知道，我迟到了。',
+  '上班前：我真的很需要这份工作；上班后：那你去开除我啊',
+  '上班还没有存款的人那都叫自费打工',
+  '摸鱼时：这钱还挺好赚；认真工作时：你他妈的给我几个钱啊',
+  '有人相爱，有人夜里看海，有人七八个闹钟起不来',
+  '打工打工两手空空，闹钟一响就要开工',
+  '上辈子作恶多端，这辈子早起上班',
+  '枯藤老树昏鸦，上班摸鱼，下班回家',
+  '古道西风瘦马，老板坐车，我骑爱玛',
+  '打工的快乐是你想象不到的，因为打工根本就没有快乐',
+  '我上班领的不是薪水，而是精神损失费',
+  '世界上只有一种英雄主义，那就是早起上班。',
+  '努力不一定被看到 但摸鱼休息一定会。',
+  '每天早上睡着都要骂自己几句，怎么找了个早八的工作',
+  '今天打工不努力，明日回村掰苞米',
+  '只要我一直不努力，老板，就过不上他想要的生活',
+  '装模做样上班，真心实意下班',
+  '日常四个期盼：等周五、等下班、等快递、等发工资',
+  '金窝银窝不如我的办公桌',
+  '锄禾日当午，打工好辛苦',
+  '放假发的朋友圈叫朋友圈，上班发的朋友圈叫劳改日记',
+  '我上班的怨气可以复活十个邪剑仙',
+  '余额：你最好创造心情',
+  '今日心情：没心情工作',
+  '生活不是卡通，请你起床打工。',
+  '人之初性本善 不想上班怎么办',
+  '如果坐牢有平替，那一定是上班。',
+  '刚喝了一杯美式，好苦，跟我的命一样苦。',
+  '漫长的岁月 竟没有一天适合上班',
+  '没有困难的工作，只有勇敢的打工人',
+  '打工只是一场戏，大家因为贫困而相聚',
+  '早上多睡了五分钟，电动车都能拧冒烟',
+  '一星期 总有那么5天摸鱼上班',
+  '葡萄酒开了都要醒五分钟，人醒了却要立刻去上班',
+  '加班不是福报 摸鱼才是王道'
+];
+
+// 基础信息渲染
+document.getElementById('yearMonth').innerText = `${today.getFullYear()}年${today.getMonth() + 1}月`;
+const currentWeekText = `星期${weekDays[dayOfWeek]}`;
+document.getElementById('week').innerText = currentWeekText;
+document.getElementById('dayNum').innerText = today.getDate();
+
+if(isWeekend) {
+  document.getElementById('weekend').innerText = '';
+  document.getElementById('weekendText').innerText = '就是今天';
+} else {
+  document.getElementById('weekend').innerText = weekendDays;
+  document.getElementById('weekendText').innerText = '天';
+}
+
+document.getElementById('lunar').innerText = LunarCalculator.getLunarDisplayText(lunarInfo, isWeekend);
+
+// 问候语
+const greeting = getTimeGreeting();
+const greetingText = `${greeting}，摸鱼人！工作再忙一定不要忘记休息哦！起身去茶水间，去厕所走走，钱是老板的但命是自己的，祝愿摸鱼人愉快的渡过每一天...`;
+document.getElementById('todaySpecial').innerText = greetingText;
+
+// 摸鱼指数
+const fishIndex = Math.floor(Math.random() * 100) + 1;
+let fishLevelText = '';
+if(fishIndex >= 100) fishLevelText = '🐠 鱼王';
+else if(fishIndex >= 90) fishLevelText = '🦈 鱼鲨';
+else if(fishIndex >= 80) fishLevelText = '🐟 老油条';
+else if(fishIndex >= 70) fishLevelText = '🐡 熟练工';
+else fishLevelText = '🐣 新手';
+
+const fishLevelHtml = isWeekend 
+  ? `摸鱼指数 <span class="fish-index-number">${fishIndex}%</span> ｜ ${fishLevelText}` 
+  : `🐟 摸鱼指数 <span class="fish-index-number">${fishIndex}%</span> ｜ ${fishLevelText}`;
+document.getElementById('fishLevel').innerHTML = fishLevelHtml;
+
+// 星座
+const getZodiac = (month, day) => {
+  const arr = [20,19,21,20,21,22,23,23,23,24,23,22];
+  const zodiacs = ['水瓶座','双鱼座','白羊座','金牛座','双子座','巨蟹座','狮子座','处女座','天秤座','天蝎座','射手座','摩羯座'];
+  return day < arr[month-1] ? zodiacs[month-1] : zodiacs[month%12];
+};
+const zodiac = getZodiac(today.getMonth() + 1, today.getDate());
+const zodiacQuotes = ['灵感爆棚，先摸再说', '摸鱼需谨慎，老板在附近', '适合摸鱼，不宜内卷', '摸鱼效率MAX', '小心摸鱼被抓'];
+document.getElementById('zodiac').innerText = `⭐ ${zodiac}：${zodiacQuotes[Math.floor(Math.random()*zodiacQuotes.length)]}`;
+
+// 运势
+const fortunes = ['今日宜摸鱼，忌认真工作', '摸鱼时记得屏蔽老板，财运+1', '适合带薪拉屎，摸鱼指数拉满', '小心领导突击检查，建议低调摸鱼', '摸鱼虽好，可不要贪杯哦'];
+document.getElementById('fortune').innerText = fortunes[Math.floor(Math.random()*fortunes.length)];
+
+// 随机图片
+const randomImgIndex = Math.floor(Math.random() * fishImgList.length);
+document.getElementById('randomFishImg').src = fishImgList[randomImgIndex];
+
+// PC端右侧信息
+const formattedDate = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,0)}-${String(today.getDate()).padStart(2,0)}`;
+document.getElementById('pc-calendar-title').innerText = `${formattedDate} / 星期${weekDays[dayOfWeek]}`;
+document.getElementById('pc-lunar-data').innerHTML = LunarCalculator.formatLunarHtml(lunarInfo);
+
+// 发薪日计算
+const calculateSalaryDays = () => {
+  const currentDay = today.getDate();
+  const currentMonth = today.getMonth();
+  const currentYear = today.getFullYear();
+  const lastDayOfMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+  
+  const salaryConfigs = [
+    { name: '月初', day: 1 },
+    { name: '10号', day: 10 },
+    { name: '15号', day: 15 },
+    { name: '20号', day: 20 },
+    { name: '25号', day: 25 },
+    { name: '月底', day: lastDayOfMonth }
+  ];
+  
+  let html = '';
+  salaryConfigs.forEach(item => {
+    let targetDate, diffDays;
+    if (currentDay <= item.day) {
+      targetDate = new Date(currentYear, currentMonth, item.day);
+    } else {
+      const nextMonth = currentMonth + 1;
+      const nextYear = nextMonth > 11 ? currentYear + 1 : currentYear;
+      const nextMonthAdjust = nextMonth > 11 ? 0 : nextMonth;
+      const targetDay = item.name === '月底' 
+        ? new Date(nextYear, nextMonthAdjust + 1, 0).getDate() 
+        : item.day;
+      targetDate = new Date(nextYear, nextMonthAdjust, targetDay);
+    }
+    
+    diffDays = Math.ceil((targetDate.getTime() - today.getTime()) / (1000 * 3600 * 24));
+    
+    let displayText = '';
+    if (diffDays === 0) displayText = `${item.name}：今天发薪！🎉`;
+    else if (diffDays === 1) displayText = `${item.name}：明天发！🥳`;
+    else if (diffDays < 0) displayText = `${item.name}：已发薪 ✅`;
+    else displayText = `${item.name}：${diffDays}天`;
+    
+    html += `${displayText}<br>`;
+  });
+  
+  return html;
+};
+
+document.getElementById('salaryDays').innerHTML = calculateSalaryDays();
+
+// 节日倒计时
+const fesDiv = document.getElementById('festival');
+fesDiv.innerHTML = '<h3>🎉 节日倒计时</h3>';
+
+const getDiffDays = (targetDate) => {
+  const timeDiff = targetDate.getTime() - today.getTime();
+  return Math.ceil(timeDiff / (1000 * 3600 * 24));
+};
+
+const createDate = (year, month, day) => new Date(year, month - 1, day);
+
+const festivals = [
+  ['元旦','solar',1,1],['春节','lunar',1,1],['清明','solar',4,5],['劳动节','solar',5,1],
+  ['端午','lunar',5,5],['中秋','lunar',8,15],['国庆','solar',10,1]
+];
+
+festivals.forEach(f => {
+  let d;
+  if(f[1] === 'solar') {
+    d = createDate(today.getFullYear(), f[2], f[3]);
+  } else {
+    const r = solarlunar.lunar2solar(today.getFullYear(), f[2], f[3]);
+    d = new Date(r.cYear, r.cMonth - 1, r.cDay);
+  }
+  if(d < today) d.setFullYear(d.getFullYear() + 1);
+  fesDiv.innerHTML += `<span class="pill">${f[0]}：${getDiffDays(d)}天</span>`;
+});
+
+// 随机语录
+const randomQuote = allQuotes[Math.floor(Math.random() * allQuotes.length)];
+document.getElementById('footer-quote').innerText = randomQuote;
+document.getElementById('pc-quote-content').innerText = randomQuote;
+
+// 导出图片
+function exportImg() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  const hours = String(now.getHours()).padStart(2, '0');
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  const seconds = String(now.getSeconds()).padStart(2, '0');
+  
+  const fileName = `${year}${month}${day}${hours}${minutes}${seconds}摸鱼总经办.png`;
+  
+  html2canvas(document.getElementById('poster'), {
+    scale: 2,
+    useCORS: true,
+    logging: false
+  }).then(canvas => {
+    const a = document.createElement('a');
+    a.download = fileName;
+    a.href = canvas.toDataURL('image/png');
+    a.click();
+  });
+}
+</script>
+
+</body>
+</html>
