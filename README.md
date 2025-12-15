@@ -1,5 +1,9 @@
 # 摸鱼日历 (所有代码都是使用 ChatGPT还有豆包ai编写）    
-  
+  <p align="center">
+    <a href="https://github.com/zhou75i"><img alt="Author" src="https://img.shields.io/badge/author-zhou75i-blueviolet"/></a>
+    <img alt="html" src="https://img.shields.io/badge/code-html-success"/>
+    <img alt="python" src="https://img.shields.io/badge/code-python-blue">
+</p>
 
 ## PC端示例图
 
