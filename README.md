@@ -16,3 +16,7 @@
 ## Python推送示例图
 
 ![img_3.png](doc/Python.png)
+
+## 60s推送示例图
+
+![img_4.png](doc/60s.png)
